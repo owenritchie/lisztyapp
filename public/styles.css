@@ -249,7 +249,7 @@ input[type="text"], input[type="search"] {
     justify-content: space-between;
     height: 100%;
     border: 2px solid transparent;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .recommendation-item.playing {
@@ -282,7 +282,7 @@ input[type="text"], input[type="search"] {
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
-    border-radius: 2px; 
+    border-radius: 2px;
     margin-bottom: 0.25rem;
     transition: all 0.3s ease;
 }
@@ -330,9 +330,9 @@ input[type="text"], input[type="search"] {
         padding: 0.3rem;
     }
     .recommendation-item audio {
-        display: none; 
+        display: none;
     }
-    
+
 }
 
 @media (max-width: 480px) {
@@ -350,5 +350,64 @@ input[type="text"], input[type="search"] {
 
     .recommendation-item {
         padding: 0.25rem;
+    }
+}
+/*CUTOFF*/
+/* Update the recommendations grid */
+.recommendations {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 1rem;
+}
+
+/* Update the recommendation item */
+.recommendation-item {
+    width: 100%;
+    aspect-ratio: 1 / 1.2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.5rem;
+    overflow: hidden;
+}
+
+.recommendation-item img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 0.25rem;
+}
+
+.recommendation-item .song-name,
+.recommendation-item .artist-name {
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    padding: 0 0.25rem;
+}
+
+/* Adjust for mobile */
+@media (max-width: 767px) {
+    .recommendations {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.25rem;
+        padding: 0 0.5rem;
+    }
+
+    .recommendation-item {
+        padding: 0.25rem;
+    }
+}
+
+/* Adjust for very small screens */
+@media (max-width: 359px) {
+    .recommendations {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }
