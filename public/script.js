@@ -6,17 +6,17 @@ let currentAudio = null;
 let currentPlayingItem = null;
 
 async function fetchConfig() {
-  const response = await fetch('/config');
-  const config = await response.json();
-  clientId = config.SPOTIFY_CLIENT_ID;
-  clientSecret = config.SPOTIFY_CLIENT_SECRET;
+    const response = await fetch('/config');
+    const config = await response.json();
+    clientId = config.SPOTIFY_CLIENT_ID;
+    clientSecret = config.SPOTIFY_CLIENT_SECRET;
 }
 
 async function getAccessToken() {
     if (!clientId || !clientSecret) {
         await fetchConfig();
     }
-    const result = await axios.post('https://accounts.spotify.com/api/token', 
+    const result = await axios.post('https://accounts.spotify.com/api/token',
         'grant_type=client_credentials',
         {
             headers: {
@@ -51,10 +51,12 @@ function displaySearchResults(tracks) {
 
     searchResults.innerHTML = '';
     searchResults.style.display = 'block';
+    searchResults.style.opacity = '0';
 
     tracks.forEach((track, index) => {
         const resultItem = document.createElement('div');
         resultItem.className = 'search-result-item';
+        resultItem.style.opacity = '0';
         resultItem.innerHTML = `
             <img src="${track.album.images[2].url}" alt="${track.name}">
             <div>
@@ -64,23 +66,20 @@ function displaySearchResults(tracks) {
         `;
         resultItem.onclick = () => selectTrack(track);
         searchResults.appendChild(resultItem);
-
-        anime({
-            targets: resultItem,
-            opacity: [0, 1],
-            translateY: [10, 0],
-            easing: 'easeOutQuad',
-            duration: 300,
-            delay: index * 50
-        });
     });
 
-    anime({
+    anime.timeline({
+        easing: 'easeOutQuad'
+    }).add({
         targets: searchResults,
         opacity: [0, 1],
-        translateY: [-10, 0],
-        duration: 300,
-        easing: 'easeOutQuad'
+        duration: 150
+    }).add({
+        targets: '.search-result-item',
+        opacity: [0, 1],
+        translateY: [5, 0],
+        duration: 150,
+        delay: anime.stagger(25)
     });
 
     document.querySelector('main').style.display = 'none';
@@ -90,88 +89,48 @@ async function selectTrack(track) {
     stopCurrentAudio();
 
     const searchResults = document.querySelector('.search-results');
-    if (searchResults) {
-        anime({
-            targets: searchResults,
-            opacity: 0,
-            translateY: -10,
-            duration: 300,
-            easing: 'easeOutQuad',
-            complete: () => {
-                searchResults.style.display = 'none';
-            }
-        });
-    }
-
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.value = '';
-    }
-
     const main = document.querySelector('main');
-    if (main) {
-        main.style.display = 'flex';
-        anime({
-            targets: main,
-            opacity: [0, 1],
-            translateY: [20, 0],
-            duration: 600,
-            easing: 'easeOutQuad'
-        });
-    }
+
+    await anime({
+        targets: searchResults,
+        opacity: 0,
+        duration: 150,
+        easing: 'easeOutQuad'
+    }).finished;
+
+    searchResults.style.display = 'none';
+    document.getElementById('searchInput').value = '';
+
+    main.style.display = 'flex';
+    main.style.opacity = '0';
 
     const albumImage = document.getElementById('albumImage');
-    if (albumImage) {
-        albumImage.src = track.album.images[0].url;
-        anime({
-            targets: albumImage,
-            scale: [0.9, 1],
-            opacity: [0, 1],
-            duration: 800,
-            easing: 'spring(1, 90, 12, 0)'
-        });
-    }
+    albumImage.src = track.album.images[0].url;
+    albumImage.style.opacity = '0';
 
     const songTitle = document.getElementById('songTitle');
-    if (songTitle) {
-        songTitle.textContent = `'${track.name}'`;
-        anime({
-            targets: songTitle,
-            opacity: [0, 1],
-            translateX: [-20, 0],
-            duration: 600,
-            easing: 'easeOutQuad',
-            delay: 200
-        });
-    }
+    songTitle.textContent = `'${track.name}'`;
+    songTitle.style.opacity = '0';
 
     const artistInfo = await getArtistInfo(track.artists[0].id);
 
     const additionalDetails = document.getElementById('additionalDetails');
-    if (additionalDetails) {
-        additionalDetails.innerHTML = '';
-        const details = [
-            `Album: ${track.album.name}`,
-            `Released: ${track.album.release_date}`,
-            `Genres: ${artistInfo.genres.join(', ') || 'N/A'}`
-        ];
-        details.forEach((detail, index) => {
-            const p = document.createElement('p');
-            p.textContent = detail;
-            additionalDetails.appendChild(p);
-            anime({
-                targets: p,
-                opacity: [0, 1],
-                translateX: [-20, 0],
-                duration: 600,
-                easing: 'easeOutQuad',
-                delay: 400 + index * 100
-            });
-        });
-    }
+    additionalDetails.innerHTML = '';
+    const details = [
+        `Album: ${track.album.name}`,
+        `Released: ${track.album.release_date}`,
+        `Genres: ${artistInfo.genres.join(', ') || 'N/A'}`
+    ];
+    details.forEach((detail) => {
+        const p = document.createElement('p');
+        p.textContent = detail;
+        p.style.opacity = '0';
+        additionalDetails.appendChild(p);
+    });
 
     const artistInfoContainer = document.createElement('div');
     artistInfoContainer.className = 'artist-info';
+    artistInfoContainer.style.opacity = '0';
     artistInfoContainer.innerHTML = `
         <img id="artistImage" src="${artistInfo.images[0]?.url || '/path/to/default-artist-image.jpg'}" alt="${artistInfo.name}">
         <div class="artist-details">
@@ -181,28 +140,47 @@ async function selectTrack(track) {
     `;
     additionalDetails.appendChild(artistInfoContainer);
 
-    anime({
-        targets: artistInfoContainer,
-        opacity: [0, 1],
-        translateY: [10, 0],
-        duration: 600,
-        easing: 'easeOutQuad',
-        delay: 800
-    });
-
     const userInstructions = document.createElement('p');
     userInstructions.className = 'user-instructions';
     userInstructions.textContent = 'Click album art to play/pause songs. Some songs may not have a preview available.';
+    userInstructions.style.opacity = '0';
+    userInstructions.style.transform = 'translateY(20px)';
     additionalDetails.appendChild(userInstructions);
 
-    anime({
+    await anime.timeline({
+        easing: 'easeOutQuad'
+    }).add({
+        targets: main,
+        opacity: [0, 1],
+        duration: 250
+    }).add({
+        targets: albumImage,
+        scale: [0.95, 1],
+        opacity: [0, 1],
+        duration: 400,
+        easing: 'easeOutQuad'
+    }, '-=150').add({
+        targets: songTitle,
+        opacity: [0, 1],
+        translateX: [-10, 0],
+        duration: 300
+    }, '-=300').add({
+        targets: '#additionalDetails p:not(.user-instructions)',
+        opacity: [0, 1],
+        translateX: [-10, 0],
+        duration: 300,
+        delay: anime.stagger(50)
+    }, '-=200').add({
+        targets: artistInfoContainer,
+        opacity: [0, 1],
+        duration: 300
+    }, '-=200').add({
         targets: userInstructions,
         opacity: [0, 1],
         translateY: [10, 0],
-        duration: 600,
-        easing: 'easeOutQuad',
-        delay: 1000
-    });
+        duration: 300,
+        easing: 'easeOutQuad'
+    }, '-=50').finished;
 
     getRecommendations(track);
     resetZoom();
@@ -233,7 +211,7 @@ async function getRecommendations(track) {
     console.log('Seed genres:', seedGenres);
 
     const excludedGenres = ['pop', 'rock', 'rap', 'hip hop', 'r&b', 'country', 'electronic', 'jazz', 'classical'];
-    const specificGenres = seedGenres.filter(genre => 
+    const specificGenres = seedGenres.filter(genre =>
         !excludedGenres.includes(genre.toLowerCase())
     );
     console.log('Specific genres:', specificGenres);
@@ -271,8 +249,8 @@ async function getRecommendations(track) {
     });
     console.log('Received', result.data.tracks.length, 'recommendations');
 
-    const filteredTracks = result.data.tracks.filter(t => 
-        t.id !== track.id && 
+    const filteredTracks = result.data.tracks.filter(t =>
+        t.id !== track.id &&
         t.artists[0].id !== track.artists[0].id &&
         Math.abs(t.duration_ms - track.duration_ms) <= 240000
     );
@@ -290,7 +268,7 @@ function isValidRecommendation(track) {
 function displayRecommendations(tracks) {
     const recommendationsContainer = document.querySelector('.recommendations');
     recommendationsContainer.innerHTML = '';
-    recommendationsContainer.style.opacity = '0';  
+    recommendationsContainer.style.opacity = '0';
 
     const uniqueArtists = new Set();
     const displayedTracks = [];
@@ -304,13 +282,13 @@ function displayRecommendations(tracks) {
 
     displayedTracks.forEach(track => {
         const recommendationItem = createRecommendationItem(track);
-        recommendationItem.style.opacity = '0';  
+        recommendationItem.style.opacity = '0';
         recommendationsContainer.appendChild(recommendationItem);
     });
 
-    
+
     requestAnimationFrame(() => {
-        recommendationsContainer.style.opacity = '1';  
+        recommendationsContainer.style.opacity = '1';
         animateRecommendations();
     });
 }
@@ -324,7 +302,7 @@ function animateRecommendations() {
         delay: anime.stagger(50),
         easing: 'spring(1, 80, 10, 0)',
         duration: 600,
-        begin: function(anim) {
+        begin: function (anim) {
             document.querySelector('.recommendations').style.opacity = '1';
         }
     });
@@ -389,7 +367,7 @@ async function getAudioFeatures(trackId) {
 
 function debounce(func, delay) {
     let debounceTimer;
-    return function() {
+    return function () {
         const context = this;
         const args = arguments;
         clearTimeout(debounceTimer);
@@ -406,12 +384,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         await fetchConfig();
         await getAccessToken();
 
-        document.querySelector('main').style.display = 'none';
-
         const debounceSearch = debounce(search, 300);
         document.getElementById('searchInput').addEventListener('input', debounceSearch);
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const searchResults = document.querySelector('.search-results');
             const searchInput = document.getElementById('searchInput');
             if (searchResults && event.target !== searchInput && !searchResults.contains(event.target)) {
@@ -432,11 +408,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             easing: 'easeOutQuad',
             duration: 1000
         }).add({
+            targets: '.container',
+            opacity: [0, 1],
+            duration: 500
+        }).add({
             targets: '.site-title',
             opacity: [0, 1],
             translateY: [-30, 0],
             rotate: ['5deg', '0deg'],
-            delay: 200
         }).add({
             targets: '.search-container',
             opacity: [0, 1],
@@ -447,7 +426,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         resetZoom();
     } catch (error) {
         console.error('Error initializing application:', error);
-        // You might want to display an error message to the user here
     }
 });
 

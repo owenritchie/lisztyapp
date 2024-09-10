@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liszty</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="opacity: 0;">
         <header>
             <h1 id="liszty" class="site-title">Liszty</h1>
         </header>
@@ -17,25 +16,23 @@
             <input type="text" id="searchInput" placeholder="Search for a song...">
             <div class="search-results"></div>
         </div>
-        <main>
+
+        <main style="display: none;">
             <div class="song-info">
                 <div class="album-cover">
-                    <img id="albumImage" src="" alt="Album Cover">
+                    <img id="albumImage" alt="Album Cover">
                 </div>
                 <div class="song-details">
                     <h2 id="songTitle"></h2>
-                    <p id="albumName"></p>
-                    <p id="releaseDate"></p>
-                    <p id="popularity"></p>
                 </div>
                 <div id="additionalDetails" class="additional-info"></div>
             </div>
             <div class="recommendations"></div>
         </main>
     </div>
-    <audio id="previewAudio"></audio>
-    <script src="script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

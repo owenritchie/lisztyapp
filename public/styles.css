@@ -6,8 +6,8 @@
     --background: #0d1117;
     --surface: #161b22;
     --surface-light: #1f242d;
-    --primary: #f4d41d;
-    --primary-dark: #c5af08;
+    --primary: #8ACE00;
+    --primary-dark: #8ACE00;
     --text-primary: #c9d1d9;
     --text-secondary: #8b949e;
     --border: #30363d;
@@ -195,9 +195,9 @@ main {
     font-style: italic;
     font-weight: 500;
     padding: 0.5rem;
-    background-color: rgba(244, 212, 29, 0.1);
+    background-color: rgba(94, 244, 29, 0.1);
     border-radius: 4px;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
 }
 
 input[type="text"], input[type="search"] {
@@ -265,7 +265,7 @@ input[type="text"], input[type="search"] {
 
 .recommendation-item.playing {
     border-color: var(--primary);
-    box-shadow: 0 0 10px rgba(244, 212, 29, 0.3);
+    box-shadow: 0 0 10px rgba(31, 240, 4, 0.3);
 }
 
 .recommendation-item.playing .song-name {
